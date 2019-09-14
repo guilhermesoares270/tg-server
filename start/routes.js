@@ -21,7 +21,11 @@ Route.group(function() {
   Route.post('/users', 'UserController.create');
   Route.patch('/users', 'UserController.alter').middleware('auth');
   Route.post('/sessions', 'SessionController.create');
-  Route.get('/sessions', 'SessionController.refresh')
+  Route.get('/sessions', 'SessionController.refresh');
+
+  Route.post('/file', 'UserController.hashFile');
+  Route.get('/file', 'UserController.generateKeys');
+  Route.post('/jwt', 'UserController.createJWT');
 }).prefix('/api/v1')
 
 
