@@ -26,6 +26,13 @@ Route.group(function() {
   Route.post('/file', 'UserController.hashFile');
   Route.get('/file', 'UserController.generateKeys');
   Route.post('/jwt', 'UserController.createJWT');
+
+  Route.get('/signedJWT', 'UserController.createSignedJWT')
+
+  Route.get('/ethTest', 'UserController.eth');
+  Route.post('ethTransaction', 'UserController.ethTransaction');
+  Route.get('/createEthAccount', 'UserController.createEthereumAccount');
+
 }).prefix('/api/v1')
 
 

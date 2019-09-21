@@ -6,7 +6,26 @@ const Env = use('Env');
 const Helpers = use('Helpers');
 const jwt = use('jsonwebtoken');
 
+const uuid = require('uuid');
+const njwt = require('njwt');
+
 class HashHelper {
+
+    /**
+     * 
+     * @param {string} sda The fingerprint of the document
+     */
+    static hteste (sda, url, keyidx) {
+        const claims = {
+            'sda': sda,
+            'url': url,
+            'keyidx': keyidx
+        }
+
+        const pk = fs.readFileSync(`${Helpers.tmpPath()}/private.txt`);
+        const token = jwt.sign(claims, pk, { algorithm: 'RS256'});
+        return token;
+    }
 
     /**
      * This function is responsible for creating the digital signature
@@ -87,9 +106,9 @@ class HashHelper {
         
         const body = {
             'sub': '90129920',
-            'uuid': 'sfgdsrfg434fdt535fg',
-            'iat': 1516239022,
-            'exp': 1545926973
+            'uuid': 'teste',
+            // 'iat': 1516239022,
+            // 'exp': 1545926973
         };
 
         const base64Body = HashHelper.base64URL(body);
@@ -111,13 +130,14 @@ class HashHelper {
      */
     static signedJWT(header, payload) {
 
-        // const privateKey = 'sdalsdhasugdyagsdukj';
-        const privateKey = Env.get('RSA_PASSPHRASE')
+        const privateKey = Env.get('RSA_PASSPHRASE');
+
+        // const _pk = (new Buffer(privateKey, 'hex')).toString('base64');
 
         const signature = HashHelper.base64URL(
             crypto.createHmac('SHA256', privateKey)
-            .update(`${header}.${payload}`)
-            .digest('base64'));
+            .update(`${header}.${payload}`));
+            // .digest('base64'));
 
         
         return(`${header}.${payload}.${signature}`);

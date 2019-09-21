@@ -4,6 +4,7 @@ const User = use("App/Models/User");
 const HashHelper = use('App/Support/HashHelper');
 const FileHelper = use('App/Support/FileHelper');
 const Helpers = use('Helpers');
+const Ethereum = use('App/Services/Ethereum');
 
 class UserController {
     async create ({ request }) {
@@ -58,10 +59,39 @@ class UserController {
     }
 
     async createJWT({ request, response }) {
-        return await HashHelper.createJWT({
-            nome: 'Random string',
-            pass: 'pass'
-        });
+        // return await HashHelper.createJWT({
+        //     nome: 'Random string',
+        //     pass: 'pass'
+        // });
+        return 'Deprecated';
+    }
+
+    async createSignedJWT({ request, response }) {
+        return HashHelper.hteste(
+            '173013304aeec4e49cc6718cb4caeccb',
+            'my.vuw.ac.nz/sda-file-association',
+            '2016-01'
+        );
+    }
+
+    async eth() {
+        return await new Ethereum()
+            .getTransaction('0x379dcaeb0a555b96fcca7c3092f51ecc1410ebf87ee48e9b6b7ddfcd6e6d7b58');
+    }
+
+    async ethTransaction({ request, response }) {
+        const data = request.only(['data']);
+        // return await new Ethereum()
+        //     .transactionWithData(data.data);
+        // return await new Ethereum().tTest(data.data);
+        return await new Ethereum().getBalance('0x6637DA163590928011dd2dF2F7f34cb301799cc7');
+    }
+
+    async createEthereumAccount ({ request, response }) {
+        // return await response.send({
+        //     data: (new Ethereum().createAccount())
+        // });
+        return await new Ethereum().createAccount();
     }
 }
 
