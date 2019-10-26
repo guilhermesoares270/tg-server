@@ -33,6 +33,19 @@ Route.group(function() {
   Route.post('ethTransaction', 'UserController.ethTransaction');
   Route.get('/createEthAccount', 'UserController.createEthereumAccount');
 
+  Route.get('/contract', 'UserController.contract');
+
+  //Ganache
+  Route.get('/ganache/gas', 'UserController.ganacheDeployContract');
+
+  Route.get('/ganache/identity', 'UserController.getIdentity');
+
+  Route.get('/ganache/count', 'UserController.docsCount');
+
+  Route.get('/ganache/index', 'UserController.index');
+
+  Route.post('/ganache/', 'UserController.create');
+
 }).prefix('/api/v1')
 
 
