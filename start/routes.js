@@ -16,35 +16,23 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-
-Route.group(function() {
+Route.group(function () {
   Route.post('/users', 'UserController.create');
   Route.patch('/users', 'UserController.alter').middleware('auth');
+
   Route.post('/sessions', 'SessionController.create');
   Route.get('/sessions', 'SessionController.refresh');
 
   Route.post('/file', 'UserController.hashFile');
   Route.get('/file', 'UserController.generateKeys');
-  Route.post('/jwt', 'UserController.createJWT');
-
-  Route.get('/signedJWT', 'UserController.createSignedJWT')
-
-  Route.get('/ethTest', 'UserController.eth');
-  Route.post('ethTransaction', 'UserController.ethTransaction');
-  Route.get('/createEthAccount', 'UserController.createEthereumAccount');
-
-  Route.get('/contract', 'UserController.contract');
+  Route.get('/signedJWT', 'UserController.createSignedJWT');
 
   //Ganache
-  Route.get('/ganache/gas', 'UserController.ganacheDeployContract');
-
-  Route.get('/ganache/identity', 'UserController.getIdentity');
-
-  Route.get('/ganache/count', 'UserController.docsCount');
-
-  Route.get('/ganache/index', 'UserController.index');
-
-  Route.post('/ganache/', 'UserController.create');
+  Route.get('/ganache/deploy', 'BlockchainController.ganacheDeployContract');
+  Route.get('/ganache/identity', 'BlockchainController.getIdentity');
+  Route.get('/ganache/count', 'BlockchainController.docsCount');
+  Route.get('/ganache/index', 'BlockchainController.index');
+  Route.post('/ganache/', 'BlockchainController.create');
 
 }).prefix('/api/v1')
 

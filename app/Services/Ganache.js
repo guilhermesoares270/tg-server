@@ -7,20 +7,11 @@ const Web3 = require('web3');
  */
 class Ganache {
 
-    constructor(url) {
-        const provider = new Web3.providers.HttpProvider(url);
-        const web3 = new Web3(provider);
-        this.connection = web3;
-    }
-
-    teste () {
-        return 'aaa';
-    }
-
-    // connect(url) {
-    //     const provider = new Web3.providers.HttpProvider(url);
-    //     const web3 = new Web3(provider);
-    // }
+  constructor(url) {
+    const provider = new Web3.providers.HttpProvider(url);
+    const web3 = new Web3(provider);
+    this.connection = web3;
+  }
 }
 
 module.exports = new Ganache('http://127.0.0.1:8545');

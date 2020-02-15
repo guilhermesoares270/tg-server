@@ -10,14 +10,20 @@ This is the boilerplate for creating an API server in AdonisJs, it comes pre-con
 
 ## Setup
 
-Use the adonis command to install the blueprint
-
-```bash
-adonis new yardstick --api-only
+Install global dependencies
+```shell
+  yarn global add ganache-cli @adonisjs/cli
 ```
 
-or manually clone the repo and then run `npm install`.
+Install local dependencies
+```shell
+  yarn
+```
 
+Start the local network from cli
+```shell
+  ganache-cli
+```
 
 ### Migrations
 
@@ -25,4 +31,9 @@ Run the following command to run startup migrations.
 
 ```js
 adonis migration:run
+```
+
+Acess this route to deploy the contract manually
+```
+  127.0.0.1:3333/api/v1/ganache/deploy
 ```
