@@ -7,15 +7,24 @@ contract Docs {
         bytes32 identity;
     }
 
+    string private razao_social;
+    string private cnpj;
+
     Doc[] private DocsList;
 
-    constructor() public {
-        addDocument("123", "321");
-        addDocument("456", "654");
+    constructor(string memory input_cnpj, string memory input_razao_social)
+        public
+    {
+        cnpj = input_cnpj;
+        razao_social = input_razao_social;
     }
 
-    function addToList() public {
-        addDocument("aaa", "bbb");
+    function getEnterpriseInfo()
+        public
+        view
+        returns (string memory, string memory)
+    {
+        return (razao_social, cnpj);
     }
 
     function getDocsCount() public view returns (uint256) {

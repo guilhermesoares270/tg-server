@@ -4,26 +4,66 @@ const ContractHelper = use('App/Support/ContractHelper');
 const Ganache = use('App/Services/Ganache');
 const ContractInstance = use('App/Support/ContractInstance');
 
+const jwt = require("jsonwebtoken");
+
 class BlockchainController {
-  async ganacheDeployContract({ request, response }) {
 
-    const { abi, evm } = ContractHelper.readContract().contracts['Contract.sol']['Docs'];
-
-    const contract = new Ganache.connection.eth.Contract(abi)
-
-    return await this.deployContract(contract, abi, evm);
+  async validateToken(request, auth) {
+    const { authorization } = request.headers();
+    console.log(`auth: ${authorization}`);
+    if (!authorization) return false;
+    return true;
   }
 
-  async deployContract(contract, abi, evm) {
+  async getToken(request, auth) {
+    try {
+      const exists = await this.validateToken(request, auth);
+      console.log(`Exists: ${exists}`);
+      if (!exists) return {};
+      const { authorization } = request.headers();
+      if (!authorization) return {};
+      const token = authorization.split(" ")[1];
+      console.log(`token: ${token}`);
+      const payload = jwt.decode(token);
+      console.log(`payload: ${JSON.stringify(payload)} - keys: ${Object.keys(payload)}`);
+      return payload;
+    } catch (error) {
+      // console.log(`getToken: ${error}`);
+      return {};
+    }
+  }
 
+  async ganacheDeployContract({ request, response }) {
+
+    const { razao_social, cnpj } = request.only(["razao_social", "cnpj"]);
+
+    const { abi, evm } = ContractHelper.readContract().contracts['generic_contract.sol']['Docs'];
+
+    const contract = new Ganache.connection.eth.Contract(abi);
+
+    const deployData = {
+      abi,
+      evm,
+      contract,
+      razao_social,
+      cnpj
+    };
+
+    // return await this.deployContract(contract, abi, evm);
+    return await this.deployContract(deployData);
+  }
+
+  // async deployContract(contract, abi, evm) {
+  async deployContract({ contract, abi, evm, razao_social, cnpj }) {
     const addresses = await Ganache.connection.eth.getAccounts();
     const gasPrice = await Ganache.connection.eth.getGasPrice();
-    let deployAddress = null
+    let deployAddress = null;
 
     // Deploy the HelloWorld contract (its bytecode)
     // by spending some gas from our first address
     contract.deploy({
       data: evm.bytecode.object,
+      arguments: [cnpj, razao_social]
     })
       .send({
         from: addresses[0],
@@ -39,7 +79,8 @@ class BlockchainController {
         const contractInstance = new Ganache.connection.eth.Contract(abi, contractAddress);
 
         //static contract instance
-        ContractInstance.contract = contractInstance;
+        // ContractInstance.contract = contractInstance;
+        ContractInstance.addContract(contractInstance, razao_social, cnpj);
 
       })
       .on('error', (err) => {
@@ -54,9 +95,16 @@ class BlockchainController {
     }
   }
 
-  async docsCount() {
+  async docsCount({ request, auth }) {
+
+    const token = await this.getToken(request, auth);
+    console.log(`token: ${JSON.stringify(token)}`);
+    if (Object.keys(token).length === 0) return { size: 0 };
+    // return {
+    //   size: await ContractInstance.contract.methods.getDocsCount().call()
+    // }
     return {
-      size: await ContractInstance.contract.methods.getDocsCount().call()
+      size: await ContractInstance.contract(token.razao_social).methods.getDocsCount().call()
     }
   }
 
@@ -71,8 +119,15 @@ class BlockchainController {
     }
   }
 
+  async getEnterprise({ request }) {
+    const data = await ContractInstance.contract.methods.getEnterpriseInfo().call();
+    return {
+      razao_social: data[0],
+      cnpj: data[1]
+    }
+  }
+
   async index({ request, response }) {
-    // return response.send(await ContractInstance.contract.methods.listDocuments().call());
     const res = await ContractInstance.contract.methods.listDocuments().call();
     const signatures = res[0];
     const identities = res[1];

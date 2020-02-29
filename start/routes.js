@@ -18,7 +18,15 @@ const Route = use('Route')
 
 Route.group(function () {
   Route.post('/users', 'UserController.create');
-  Route.patch('/users', 'UserController.alter').middleware('auth');
+  Route.patch('/users/:id', 'UserController.alter').middleware('auth');
+  Route.get('/users/:id', 'UserController.get');
+  Route.get('/users', 'UserController.index');
+  Route.delete('/users/:id', 'UserController.delete');
+
+  Route.post('/enterprises', 'EnterpriseController.create');
+  Route.patch('/enterprises/:id', 'EnterpriseController.alter').middleware('auth');
+  Route.get('/enterprises/:id', 'EnterpriseController.get');
+  Route.get('/enterprises', 'EnterpriseController.index');
 
   Route.post('/sessions', 'SessionController.create');
   Route.get('/sessions', 'SessionController.refresh');
@@ -33,6 +41,7 @@ Route.group(function () {
   Route.get('/ganache/count', 'BlockchainController.docsCount');
   Route.get('/ganache/index', 'BlockchainController.index');
   Route.post('/ganache/', 'BlockchainController.create');
+  Route.get('/ganache/enterprise', 'BlockchainController.getEnterprise');
 
 }).prefix('/api/v1')
 

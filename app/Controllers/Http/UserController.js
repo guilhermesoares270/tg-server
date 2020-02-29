@@ -1,6 +1,11 @@
 'use strict'
 
 const User = use("App/Models/User");
+const Token = use("App/Models/Token");
+const Enterprise = use("App/Models/Enterprise");
+
+const Database = use('Database')
+
 const HashHelper = use('App/Support/HashHelper');
 const FileHelper = use('App/Support/FileHelper');
 const Helpers = use('Helpers');
@@ -9,14 +14,20 @@ class UserController {
 
   async create({ request }) {
     const data = request.only(["username", "email", "password"]);
-    return await User.create(data);
+    const razao_social = request.only(["razao_social"]);
+
+    const enterprise = await Enterprise.findBy("razao_social", razao_social);
+    const newData = { ...data, enterprise_id: enterprise ? enterprise.id : null }
+
+    return await User.create(newData);
   }
 
-  async alter({ request }) {
+  async alter({ request, params }) {
+    const { id } = params;
     const data = request.only(["username", "email", "password"]);
 
     const user = await User.findBy(
-      "email", data.email
+      "id", id
     );
 
     const { ...newData } = data;
@@ -25,6 +36,26 @@ class UserController {
     await user.save();
 
     return user;
+  }
+
+  async get({ params }) {
+    return await User.findBy(
+      "id", params.id
+    );
+  }
+
+  async index() {
+    return await User.all();
+  }
+
+  async delete({ params }) {
+    const user = await User.findBy(
+      "id", params.id
+    );
+    if (!user) return {};
+    await Database.table('tokens').select('*').where('user_id', user.id).delete();
+
+    return user.delete();
   }
 
   async hashFile({ request, response }) {
