@@ -11,16 +11,16 @@ contract Docs {
 
     Doc[] private DocsList;
 
-    // constructor() public {
-    //     addDocument("123", "321");
-    //     addDocument("456", "654");
-    // }
-
-    constructor(string memory input_cnpj) public {
-        cnpj = input_cnpj;
+    constructor() public {
         addDocument("123", "321");
         addDocument("456", "654");
     }
+
+    // constructor(string memory input_cnpj) public {
+    //     cnpj = input_cnpj;
+    //     addDocument("123", "321");
+    //     addDocument("456", "654");
+    // }
 
     function addToList() public {
         addDocument("aaa", "bbb");
