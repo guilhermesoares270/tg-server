@@ -11,10 +11,7 @@ class BlockchainController {
 
     const contract = new Ganache.connection.eth.Contract(abi)
 
-    return {
-      r: await this.deployContract(contract, abi, evm),
-      t: 'er'
-    }
+    return await this.deployContract(contract, abi, evm);
   }
 
   async deployContract(contract, abi, evm) {
@@ -75,7 +72,18 @@ class BlockchainController {
   }
 
   async index({ request, response }) {
-    return response.send(await ContractInstance.contract.methods.listDocuments().call());
+    // return response.send(await ContractInstance.contract.methods.listDocuments().call());
+    const res = await ContractInstance.contract.methods.listDocuments().call();
+    const signatures = res[0];
+    const identities = res[1];
+    let merge = [];
+    for (let i = 0; i < res[0].length; i++) {
+      merge.push({
+        signature: signatures[i],
+        identity: identities[i]
+      });
+    }
+    return response.send(merge);
   }
 
   async create({ request, response }) {

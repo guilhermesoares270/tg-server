@@ -7,17 +7,9 @@ contract Docs {
         bytes32 identity;
     }
 
-    string private cnpj;
-
     Doc[] private DocsList;
 
-    // constructor() public {
-    //     addDocument("123", "321");
-    //     addDocument("456", "654");
-    // }
-
-    constructor(string memory input_cnpj) public {
-        cnpj = input_cnpj;
+    constructor() public {
         addDocument("123", "321");
         addDocument("456", "654");
     }
