@@ -5,12 +5,12 @@ const Ganache = use('App/Services/Ganache');
 const ContractInstance = use('App/Support/ContractInstance');
 
 const jwt = require("jsonwebtoken");
+const jwtDecode = require('jwt-decode');
 
 class BlockchainController {
 
   async validateToken(request, auth) {
     const { authorization } = request.headers();
-    console.log(`auth: ${authorization}`);
     if (!authorization) return false;
     return true;
   }
@@ -18,14 +18,11 @@ class BlockchainController {
   async getToken(request, auth) {
     try {
       const exists = await this.validateToken(request, auth);
-      console.log(`Exists: ${exists}`);
       if (!exists) return {};
       const { authorization } = request.headers();
       if (!authorization) return {};
       const token = authorization.split(" ")[1];
-      console.log(`token: ${token}`);
-      const payload = jwt.decode(token);
-      console.log(`payload: ${JSON.stringify(payload)} - keys: ${Object.keys(payload)}`);
+      const payload = jwtDecode(token);
       return payload;
     } catch (error) {
       // console.log(`getToken: ${error}`);
@@ -98,13 +95,11 @@ class BlockchainController {
   async docsCount({ request, auth }) {
 
     const token = await this.getToken(request, auth);
-    console.log(`token: ${JSON.stringify(token)}`);
+    const { data: { enterprise } } = token;
     if (Object.keys(token).length === 0) return { size: 0 };
-    // return {
-    //   size: await ContractInstance.contract.methods.getDocsCount().call()
-    // }
+    const contractInfo = ContractInstance.contract(enterprise.razao_social);
     return {
-      size: await ContractInstance.contract(token.razao_social).methods.getDocsCount().call()
+      size: parseInt(await contractInfo.contract.methods.getDocsCount().call())
     }
   }
 

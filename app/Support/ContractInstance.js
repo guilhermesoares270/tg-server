@@ -32,9 +32,9 @@ class ContractInstance {
   }
 
   contract(razao_social) {
-    const contracts = this.contracts.filter(x => {
-      return x.razao_social === input_razao_social;
-    });
+    console.log('contract');
+    const contracts = this.contracts.filter(x => (x.razao_social === razao_social));
+    console.log(`contracts length: ${contracts.length}`);
     if (contracts.length === 0) return null;
     return contracts[0];
   }

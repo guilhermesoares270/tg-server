@@ -10,11 +10,14 @@ class SessionController {
     const { email, password } = request.all();
 
     const user = await User.findBy('email', email);
+    if (!user) return {};
     const enterprise = await Enterprise.findBy('id', user.enterprise_id);
 
     const token = await auth
       .withRefreshToken()
       .attempt(email, password, { email, password, enterprise });
+
+    console.log(`SessionController: ${JSON.stringify(token)}`);
 
     return token;
   }
