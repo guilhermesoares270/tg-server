@@ -1,5 +1,6 @@
 'use strict'
 
+const Database = use('Database');
 const Enterprise = use("App/Models/Enterprise");
 
 class EnterpriseController {
@@ -24,16 +25,13 @@ class EnterpriseController {
     return enterprise;
   }
 
-  async delete({ request }) {
-    const razao_social = request.only(["razao_social"]);
-
-    if (!razao_social) return {};
-
+  async delete({ params }) {
     const enterprise = await Enterprise.findBy(
-      "razao_social", data.razao_social
+      "id", params.id
     );
+    if (!enterprise) return {};
 
-    return await enterprise.delete();
+    return enterprise.delete();
   }
 
   async get({ params }) {
