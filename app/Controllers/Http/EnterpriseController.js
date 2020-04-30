@@ -36,7 +36,7 @@ class EnterpriseController {
 
   async get({ params }) {
     return await Enterprise.findBy(
-      "id", params.id
+      "cnpj", params.cnpj
     );
   }
 

@@ -25,7 +25,7 @@ Route.group(function () {
 
   Route.post('/enterprises', 'EnterpriseController.create');
   Route.patch('/enterprises/:id', 'EnterpriseController.alter').middleware('auth');
-  Route.get('/enterprises/:id', 'EnterpriseController.get');
+  Route.get('/enterprises/:cnpj', 'EnterpriseController.get');
   Route.get('/enterprises', 'EnterpriseController.index');
   Route.delete('/enterprises/:id', 'EnterpriseController.delete');
 
