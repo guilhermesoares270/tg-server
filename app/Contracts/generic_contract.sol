@@ -1,5 +1,6 @@
 pragma solidity ^0.6.1;
 
+
 contract Docs {
     struct Doc {
         uint256 id;

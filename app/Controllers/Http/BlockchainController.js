@@ -50,45 +50,52 @@ class BlockchainController {
     return await this.deployContract(deployData);
   }
 
-  // async deployContract(contract, abi, evm) {
   async deployContract({ contract, abi, evm, razao_social, cnpj }) {
-    const addresses = await Ganache.connection.eth.getAccounts();
-    const gasPrice = await Ganache.connection.eth.getGasPrice();
-    let deployAddress = null;
+    try {
 
-    // Deploy the HelloWorld contract (its bytecode)
-    // by spending some gas from our first address
-    contract.deploy({
-      data: evm.bytecode.object,
-      arguments: [cnpj, razao_social]
-    })
-      .send({
-        from: addresses[0],
-        gas: 1000000,
-        gasPrice,
+      const addresses = await Ganache.connection.eth.getAccounts();
+      const gasPrice = await Ganache.connection.eth.getGasPrice();
+      let deployAddress = null;
+
+      // Deploy the HelloWorld contract (its bytecode)
+      // by spending some gas from our first address
+      contract.deploy({
+        data: evm.bytecode.object,
+        arguments: [cnpj, razao_social]
       })
-      .on('confirmation', async (confNumber, receipt) => {
-        const { contractAddress } = receipt
-        console.log("Deployed at", contractAddress);
-        deployAddress = contractAddress;
+        .send({
+          from: addresses[0],
+          gas: 1000000,
+          gasPrice,
+        })
+        .on('confirmation', async (confNumber, receipt) => {
+          const { contractAddress } = receipt
+          console.log("Deployed at", contractAddress);
+          deployAddress = contractAddress;
 
-        // Get the deployed contract instance:
-        const contractInstance = new Ganache.connection.eth.Contract(abi, contractAddress);
+          // Get the deployed contract instance:
+          const contractInstance = new Ganache.connection.eth.Contract(abi, contractAddress);
 
-        //static contract instance
-        // ContractInstance.contract = contractInstance;
-        ContractInstance.addContract(contractInstance, razao_social, cnpj);
+          //static contract instance
+          // ContractInstance.contract = contractInstance;
+          ContractInstance.addContract(contractInstance, razao_social, cnpj);
 
-      })
-      .on('error', (err) => {
-        return {
-          status: 'error',
-          deploy: null
-        }
-      })
-    return {
-      status: 'success',
-      deploy: deployAddress
+        })
+        .on('error', (err) => {
+          return {
+            status: 'error',
+            deploy: null
+          }
+        })
+      return {
+        status: 'success',
+        deploy: deployAddress
+      }
+
+    } catch (error) {
+      return {
+        deploy: 'failure',
+      }
     }
   }
 
@@ -103,55 +110,95 @@ class BlockchainController {
     }
   }
 
-  async getIdentity({ request, response }) {
-    const signature = request.input('signature');
-    const doc = await ContractInstance.contract.methods.getDoc(
-      signature
-    ).call();
+  async getIdentity({ request, response, auth }) {
+    const token = await this.getToken(request, auth);
+    const { data: { enterprise } } = token;
 
-    return {
-      identity: doc
-    }
-  }
-
-  async getEnterprise({ request }) {
-    const data = await ContractInstance.contract.methods.getEnterpriseInfo().call();
-    return {
-      razao_social: data[0],
-      cnpj: data[1]
-    }
-  }
-
-  async index({ request, response }) {
-    const res = await ContractInstance.contract.methods.listDocuments().call();
-    const signatures = res[0];
-    const identities = res[1];
-    let merge = [];
-    for (let i = 0; i < res[0].length; i++) {
-      merge.push({
-        signature: signatures[i],
-        identity: identities[i]
+    try {
+      const signature = request.input('signature');
+      const contractInfo = ContractInstance.contract(enterprise.razao_social);
+      const doc = await contractInfo.contract.methods.getDoc(signature).call();
+      return response.send({
+        data: [doc],
+        errors: []
       });
+    } catch (error) {
+      response.send({ data: [], errors: [error.message] });
     }
-    return response.send(merge);
   }
 
-  async create({ request, response }) {
-    const signature = request.input('signature');
-    const identity = request.input('identity');
+  async getEnterprise({ request, auth }) {
+    try {
+      const token = await this.getToken(request, auth);
+      const { data: { enterprise } } = token;
 
-    const addresses = await Ganache.connection.eth.getAccounts();
+      const contractInfo = ContractInstance.contract(enterprise.razao_social);
+      const data = await contractInfo.contract.methods.getEnterpriseInfo().call();
+      return {
+        ...data,
+        errors: [],
+      };
+    } catch (error) {
+      console.log(`Enterprise Error: ${error}`);
+      return {
+        razao_social: null,
+        cnpj: null,
+        errors: [error.message]
+      }
+    }
+  }
 
-    await ContractInstance.contract.methods.addDocument(
-      Ganache.connection.utils.fromUtf8(signature),
-      Ganache.connection.utils.fromUtf8(identity)
-    ).send({ from: addresses[1] });
+  async index({ request, response, auth }) {
+    const token = await this.getToken(request, auth);
+    const { data: { enterprise } } = token;
 
-    response.send({
-      message: 'Document added successfully',
-      "signature": Ganache.connection.utils.fromUtf8(signature),
-      "identity": Ganache.connection.utils.fromUtf8(identity)
-    });
+    try {
+      const contractInfo = ContractInstance.contract(enterprise.razao_social);
+      const res = await contractInfo.contract.methods.listDocuments().call();
+      const signatures = res[0];
+      const identities = res[1];
+
+      let merge = [];
+      for (let i = 0; i < res[0].length; i++) {
+        merge.push({
+          signature: signatures[i],
+          identity: identities[i]
+        });
+      }
+      return response.send({ data: [...merge], errors: [] });
+    } catch (error) {
+      return response.send({ data: [], errors: error.message });
+    }
+  }
+
+  async create({ request, response, auth }) {
+    const token = await this.getToken(request, auth);
+    const { data: { enterprise } } = token;
+
+    try {
+      const signature = request.input('signature');
+      const identity = request.input('identity');
+
+      const addresses = await Ganache.connection.eth.getAccounts();
+
+      const contractInfo = ContractInstance.contract(enterprise.razao_social);
+
+      await contractInfo.contract.methods.addDocument(
+        Ganache.connection.utils.fromUtf8(signature),
+        Ganache.connection.utils.fromUtf8(identity)
+      ).send({ from: addresses[1] });
+
+      response.send({
+        data: {
+          message: 'Document added successfully',
+          "signature": Ganache.connection.utils.fromUtf8(signature),
+          "identity": Ganache.connection.utils.fromUtf8(identity)
+        },
+        errors: []
+      });
+    } catch (error) {
+      return response.send({ data: [], errors: [] });
+    }
   }
 }
 
