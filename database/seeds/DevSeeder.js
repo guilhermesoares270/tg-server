@@ -8,7 +8,7 @@ class UserSeeder {
   async run() {
     await Database.table('enterprises').insert({
       razao_social: 'empresa1',
-      cnpj: '89797',
+      cnpj: '43850031810',
       email: 'empresa1@gmail.com',
       password: 'empresa1',
       cep: '12710400'
@@ -18,7 +18,8 @@ class UserSeeder {
       username: 'Teste',
       email: 'teste@gmail.com',
       password: await Hash.make('123'),
-      enterprise_id: 1
+      enterprise_id: 1,
+      enterprise_cnpj: '43850031810',
     });
   }
 }

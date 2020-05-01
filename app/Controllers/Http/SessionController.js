@@ -17,9 +17,13 @@ class SessionController {
       .withRefreshToken()
       .attempt(email, password, { email, password, enterprise });
 
-    console.log(`SessionController: ${JSON.stringify(token)}`);
+    console.log(`${enterprise.cnpj} SessionController: ${JSON.stringify(token)}`);
 
-    return token;
+    // return token;
+    return {
+      ...token,
+      enterprise_cnpj: enterprise.cnpj,
+    };
   }
 
   async refresh({ request, auth }) {

@@ -17,7 +17,11 @@ class UserController {
     const razao_social = request.only(["razao_social"]);
 
     const enterprise = await Enterprise.findBy("razao_social", razao_social);
-    const newData = { ...data, enterprise_id: enterprise ? enterprise.id : null }
+    const newData = {
+      ...data,
+      enterprise_id: enterprise ? enterprise.id : null,
+      enterprise_cnpj: enterprise ? enterprise.cnpj : null
+    }
 
     return await User.create(newData);
   }

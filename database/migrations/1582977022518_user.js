@@ -11,6 +11,7 @@ class UserSchema extends Schema {
       table.string('email', 254).notNullable().unique()
       table.string('password', 60).notNullable()
       table.integer('enterprise_id').unsigned().references('id').inTable('enterprises')
+      table.string('enterprise_cnpj')
       table.timestamps()
     })
   }
