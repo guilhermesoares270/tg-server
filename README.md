@@ -22,7 +22,7 @@ Install local dependencies
 
 Start the local network from cli
 ```shell
-  ganache-cli
+  ganache-cli --allowUnlimitedContractSize
 ```
 
 ### Migrations

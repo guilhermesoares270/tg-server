@@ -30,10 +30,7 @@ class BlockchainController {
     }
   }
 
-  async ganacheDeployContract({ request, response }) {
-
-    const { razao_social, cnpj } = request.only(["razao_social", "cnpj"]);
-
+  async deploy(razao_social, cnpj) {
     const { abi, evm } = ContractHelper.readContract().contracts['generic_contract.sol']['Docs'];
 
     const contract = new Ganache.connection.eth.Contract(abi);
@@ -46,8 +43,28 @@ class BlockchainController {
       cnpj
     };
 
-    // return await this.deployContract(contract, abi, evm);
     return await this.deployContract(deployData);
+  }
+
+  async ganacheDeployContract({ request, response }) {
+
+    const { razao_social, cnpj } = request.only(["razao_social", "cnpj"]);
+
+    return await deploy(razao_social, cnpj);
+
+    // const { abi, evm } = ContractHelper.readContract().contracts['generic_contract.sol']['Docs'];
+
+    // const contract = new Ganache.connection.eth.Contract(abi);
+
+    // const deployData = {
+    //   abi,
+    //   evm,
+    //   contract,
+    //   razao_social,
+    //   cnpj
+    // };
+
+    // return await this.deployContract(deployData);
   }
 
   async deployContract({ contract, abi, evm, razao_social, cnpj }) {
@@ -154,6 +171,8 @@ class BlockchainController {
 
     try {
       const contractInfo = ContractInstance.contract(enterprise.razao_social);
+      if (contractInfo == null) throw Error('Contract for this enterprise not found');
+
       const res = await contractInfo.contract.methods.listDocuments().call();
       const signatures = res[0];
       const identities = res[1];

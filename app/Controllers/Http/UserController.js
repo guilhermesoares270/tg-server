@@ -14,16 +14,30 @@ class UserController {
 
   async create({ request }) {
     const data = request.only(["username", "email", "password"]);
-    const razao_social = request.only(["razao_social"]);
+    const razao_social = request.only(["razao_social"]).razao_social;
 
-    const enterprise = await Enterprise.findBy("razao_social", razao_social);
-    const newData = {
-      ...data,
-      enterprise_id: enterprise ? enterprise.id : null,
-      enterprise_cnpj: enterprise ? enterprise.cnpj : null
+    try {
+      const enterprise = await Enterprise.findBy("razao_social", razao_social);
+      if (enterprise == null) throw Error('Enterprise not found');
+
+      const newData = {
+        ...data,
+        enterprise_id: enterprise ? enterprise.id : null,
+        enterprise_cnpj: enterprise ? enterprise.cnpj : null,
+      }
+
+      const newUser = await User.create(newData);
+
+      return {
+        data: Object.assign(newUser, { enterprise_razao_social: enterprise ? enterprise.razao_social : null }),
+        errors: []
+      };
+    } catch (error) {
+      return {
+        data: null,
+        errors: [error.message],
+      };
     }
-
-    return await User.create(newData);
   }
 
   async alter({ request, params }) {
