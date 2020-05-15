@@ -1,6 +1,5 @@
 'use strict'
 
-const Database = use('Database');
 const Enterprise = use("App/Models/Enterprise");
 const BlockchainController = use("App/Controllers/Http/BlockchainController");
 

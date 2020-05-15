@@ -11,6 +11,7 @@ class EnterprisesSchema extends Schema {
       table.string('cnpj', 30).notNullable().unique()
       table.string('email', 254).notNullable().unique()
       table.string('password', 60).notNullable()
+      table.string('contract_address', 128).unique()
       table.string('phone', 30)
       table.string('cep', 30)
       table.timestamps()

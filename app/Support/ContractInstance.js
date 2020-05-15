@@ -19,6 +19,7 @@ class ContractInstance {
   }
 
   addContract(contract, razao_social, cnpj) {
+    console.log(`addContract`);
     if (!this.contractExist(razao_social)) {
       this.contracts.push({
         contract,

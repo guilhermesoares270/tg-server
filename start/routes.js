@@ -38,7 +38,8 @@ Route.group(function () {
 
   //Ganache
   Route.get('/ganache/deploy', 'BlockchainController.ganacheDeployContract');
-  Route.get('/ganache/identity', 'BlockchainController.getIdentity');
+  // Route.get('/ganache/identity', 'BlockchainController.getIdentity');
+  Route.get('/ganache/getDoc', 'BlockchainController.getDocument');
   Route.get('/ganache/count', 'BlockchainController.docsCount');
   Route.get('/ganache/index', 'BlockchainController.index');
   Route.post('/ganache/', 'BlockchainController.create');
