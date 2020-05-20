@@ -1,13 +1,7 @@
-// const { abi, evm } = ContractHelper.readContract().contracts['generic_contract.sol']['Docs'];
-// const contractInstance = new Wallet.eth.Contract(abi, '0x5dbb5c21EC4bfE09fC96674a3050bAbE9FaAc222');
-// const addresses = await Wallet.eth.getAccounts();
-// ContractInstance.addContract(contractInstance, 'empresa1', '897975');
-
 const ContractHelper = require('../Support/ContractHelper');
-// const enterpriseModel = require('../Models/Enterprise');
 const ContractInstance = require('../Support/ContractInstance');
 const Wallet = require('../Services/EnterpriseWallet');
-const { Pool, Client } = require('pg')
+const { Client } = require('pg');
 
 const findContracts = async () => {
   const { abi } = ContractHelper.readContract().contracts['generic_contract.sol']['Docs'];

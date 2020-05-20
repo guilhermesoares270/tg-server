@@ -5,13 +5,17 @@ const BlockchainController = use("App/Controllers/Http/BlockchainController");
 
 class EnterpriseController {
   async create({ request }) {
-    const data = request.only(["razao_social", "cnpj", "email", "password", "cep"]);
+    try {
+      const data = request.only(["razao_social", "cnpj", "email", "password", "cep"]);
 
-    const enterprise = await Enterprise.create(data);
-    // const blockchainController = new BlockchainController();
-    // await blockchainController.deploy(data.razao_social, data.cnpj);
+      const enterprise = await Enterprise.create(data);
+      const blockchainController = new BlockchainController();
+      await blockchainController.deploy(data.razao_social, data.cnpj);
 
-    return enterprise;
+      return enterprise;
+    } catch (error) {
+      return null;
+    }
   }
 
   async alter({ request, params }) {
