@@ -37,3 +37,5 @@ Acess this route to deploy the contract manually
 ```
   127.0.0.1:3333/api/v1/ganache/deploy
 ```
+### Install ganache-cli 
+ Run with ```ganache-cli --allowUnlimitedContractSize```
