@@ -37,6 +37,9 @@
     "web3": "^1.2.1"
   },
   "devDependencies": {},
+  "engines": {
+    "node": "13.x"
+  },
   "autoload": {
     "App": "./app"
   }
