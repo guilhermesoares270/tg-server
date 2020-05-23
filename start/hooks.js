@@ -1,6 +1,6 @@
 const { hooks } = require('@adonisjs/ignitor');
 const InitContracts = require('../app/Services/InitContracts');
 
-hooks.after.providersBooted(() => {
+hooks.after.httpServer(() => {
   InitContracts();
-})
+});
